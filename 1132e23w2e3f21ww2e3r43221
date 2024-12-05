@@ -1,64 +1,47 @@
-local AkaliNotif = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProjectpopCat/ywxoscripts/main/akaliedited.lua"))();
-local Notify = AkaliNotif.Notify;
+local AkaliNotif = loadstring(game:HttpGet("https://raw.githubusercontent.com/ProjectpopCat/ywxoscripts/main/akaliedited.lua"))()
+local Notify = AkaliNotif.Notify
 
-PLAYER  = game.Players.LocalPlayer
-MOUSE   = PLAYER:GetMouse()
-CC      = game.Workspace.CurrentCamera
+local PLAYER = game.Players.LocalPlayer
+local MOUSE = PLAYER:GetMouse()
+local CC = game.Workspace.CurrentCamera
 
-ENABLED      = false
-ESP_ENABLED  = false
+local ENABLED = false
+local ESP_ENABLED = false
 
 _G.FREE_FOR_ALL = true
-
-_G.ESP_BIND    = 52
-_G.CHANGE_AIM  = 'q'
-
-_G.AIM_AT = 'Head' -- Ensure the target is always 'Head'
+_G.ESP_BIND = 52
+_G.CHANGE_AIM = 'q'
+_G.AIM_AT = 'Head'  -- Ensure the target is always 'Head'
 
 wait(1)
 
 function GetNearestPlayerToMouse()
-    local PLAYERS      = {}
-    local PLAYER_HOLD  = {}
-    local DISTANCES    = {}
+    local PLAYERS = {}
+    local PLAYER_HOLD = {}
+    local DISTANCES = {}
+    
+    -- Collect all players
     for i, v in pairs(game.Players:GetPlayers()) do
         if v ~= PLAYER then
             table.insert(PLAYERS, v)
         end
     end
+
+    -- Calculate distance for each player
     for i, v in pairs(PLAYERS) do
-        if _G.FREE_FOR_ALL == false then
-            if v and (v.Character) ~= nil and v.TeamColor ~= PLAYER.TeamColor then
-                local AIM = v.Character:FindFirstChild("Head") -- Strictly target the Head
-                if AIM ~= nil then
-                    local DISTANCE                 = (AIM.Position - game.Workspace.CurrentCamera.CoordinateFrame.p).magnitude
-                    local RAY                      = Ray.new(game.Workspace.CurrentCamera.CoordinateFrame.p, (MOUSE.Hit.p - CC.CoordinateFrame.p).unit * DISTANCE)
-                    local HIT,POS                  = game.Workspace:FindPartOnRay(RAY, game.Workspace)
-                    local DIFF                     = math.floor((POS - AIM.Position).magnitude)
-                    PLAYER_HOLD[v.Name .. i]       = {}
-                    PLAYER_HOLD[v.Name .. i].dist  = DISTANCE
-                    PLAYER_HOLD[v.Name .. i].plr   = v
-                    PLAYER_HOLD[v.Name .. i].diff  = DIFF
-                    table.insert(DISTANCES, DIFF)
-                end
-            end
-        elseif _G.FREE_FOR_ALL == true then
-            local AIM = v.Character:FindFirstChild("Head") -- Strictly target the Head
-            if AIM ~= nil then
-                local DISTANCE                 = (AIM.Position - game.Workspace.CurrentCamera.CoordinateFrame.p).magnitude
-                local RAY                      = Ray.new(game.Workspace.CurrentCamera.CoordinateFrame.p, (MOUSE.Hit.p - CC.CoordinateFrame.p).unit * DISTANCE)
-                local HIT,POS                  = game.Workspace:FindPartOnRay(RAY, game.Workspace)
-                local DIFF                     = math.floor((POS - AIM.Position).magnitude)
-                PLAYER_HOLD[v.Name .. i]       = {}
-                PLAYER_HOLD[v.Name .. i].dist  = DISTANCE
-                PLAYER_HOLD[v.Name .. i].plr   = v
-                PLAYER_HOLD[v.Name .. i].diff  = DIFF
-                table.insert(DISTANCES, DIFF)
-            end
+        local AIM = v.Character and v.Character:FindFirstChild(_G.AIM_AT)  -- Target the specified body part (head)
+        if AIM then
+            local DISTANCE = (AIM.Position - game.Workspace.CurrentCamera.CoordinateFrame.p).magnitude
+            local RAY = Ray.new(game.Workspace.CurrentCamera.CoordinateFrame.p, (MOUSE.Hit.p - CC.CoordinateFrame.p).unit * DISTANCE)
+            local HIT, POS = game.Workspace:FindPartOnRay(RAY, game.Workspace)
+            local DIFF = math.floor((POS - AIM.Position).magnitude)
+            
+            PLAYER_HOLD[v.Name .. i] = {dist = DISTANCE, plr = v, diff = DIFF}
+            table.insert(DISTANCES, DIFF)
         end
     end
     
-    if unpack(DISTANCES) == nil then
+    if #DISTANCES == 0 then
         return false
     end
     
@@ -77,42 +60,42 @@ end
 
 local TRACK = false
 
-function CREATE(BASE, TEAM)
-    local ESP_MAIN                   = Instance.new('BillboardGui', PLAYER.PlayerGui)
-    local ESP_DOT                    = Instance.new('Frame', ESP_MAIN)
-    local ESP_NAME                   = Instance.new('TextLabel', ESP_MAIN)
+function CREATE(BASE)
+    local ESP_MAIN = Instance.new('BillboardGui', PLAYER.PlayerGui)
+    local ESP_DOT = Instance.new('Frame', ESP_MAIN)
+    local ESP_NAME = Instance.new('TextLabel', ESP_MAIN)
     
-    ESP_MAIN.Name                    = 'ESP'
-    ESP_MAIN.Adornee                 = BASE
-    ESP_MAIN.AlwaysOnTop             = true
-    ESP_MAIN.ExtentsOffset           = Vector3.new(0, 1, 0)
-    ESP_MAIN.Size                    = UDim2.new(0, 5, 0, 5)
+    ESP_MAIN.Name = 'ESP'
+    ESP_MAIN.Adornee = BASE
+    ESP_MAIN.AlwaysOnTop = true
+    ESP_MAIN.ExtentsOffset = Vector3.new(0, 1, 0)
+    ESP_MAIN.Size = UDim2.new(0, 5, 0, 5)
     
-    ESP_DOT.Name                     = 'DOT'
-    ESP_DOT.BackgroundColor          = BrickColor.new('Bright red')
-    ESP_DOT.BackgroundTransparency   = 0.3
-    ESP_DOT.BorderSizePixel          = 0
-    ESP_DOT.Position                 = UDim2.new(-0.5, 0, -0.5, 0)
-    ESP_DOT.Size                     = UDim2.new(2, 0, 2, 0)
-    ESP_DOT.Visible                  = true
-    ESP_DOT.ZIndex                   = 10
+    ESP_DOT.Name = 'DOT'
+    ESP_DOT.BackgroundColor = BrickColor.new('Bright red')
+    ESP_DOT.BackgroundTransparency = 0.3
+    ESP_DOT.BorderSizePixel = 0
+    ESP_DOT.Position = UDim2.new(-0.5, 0, -0.5, 0)
+    ESP_DOT.Size = UDim2.new(2, 0, 2, 0)
+    ESP_DOT.Visible = true
+    ESP_DOT.ZIndex = 10
     
-    ESP_NAME.Name                    = 'NAME'
-    ESP_NAME.BackgroundColor3        = Color3.new(255, 255, 255)
-    ESP_NAME.BackgroundTransparency  = 1
-    ESP_NAME.BorderSizePixel         = 0
-    ESP_NAME.Position                = UDim2.new(0, 0, 0, -40)
-    ESP_NAME.Size                    = UDim2.new(1, 0, 10, 0)
-    ESP_NAME.Visible                 = true
-    ESP_NAME.ZIndex                  = 10
-    ESP_NAME.Font                    = 'ArialBold'
-    ESP_NAME.FontSize                = 'Size14'
-    ESP_NAME.Text                    = BASE.Parent.Name:upper()
-    ESP_NAME.TextColor               = BrickColor.new('Bright red')
+    ESP_NAME.Name = 'NAME'
+    ESP_NAME.BackgroundColor3 = Color3.new(255, 255, 255)
+    ESP_NAME.BackgroundTransparency = 1
+    ESP_NAME.BorderSizePixel = 0
+    ESP_NAME.Position = UDim2.new(0, 0, 0, -40)
+    ESP_NAME.Size = UDim2.new(1, 0, 10, 0)
+    ESP_NAME.Visible = true
+    ESP_NAME.ZIndex = 10
+    ESP_NAME.Font = Enum.Font.ArialBold
+    ESP_NAME.FontSize = Enum.FontSize.Size14
+    ESP_NAME.Text = BASE.Parent.Name:upper()
+    ESP_NAME.TextColor = BrickColor.new('Bright red')
 end
 
 function CLEAR()
-    for _,v in pairs(PLAYER.PlayerGui:children()) do
+    for _, v in pairs(PLAYER.PlayerGui:children()) do
         if v.Name == 'ESP' and v:IsA('BillboardGui') then
             v:Destroy()
         end
@@ -126,57 +109,55 @@ function FIND()
         while wait() do
             if TRACK then
                 CLEAR()
-                for i,v in pairs(game.Players:GetChildren()) do
+                for _, v in pairs(game.Players:GetChildren()) do
                     if v.Character and v.Character:FindFirstChild('Head') then
-                        if _G.FREE_FOR_ALL == false then
-                            if v.TeamColor ~= PLAYER.TeamColor then
-                                if v.Character:FindFirstChild('Head') then
-                                    CREATE(v.Character.Head, true)
-                                end
-                            end
-                        else
-                            if v.Character:FindFirstChild('Head') then
-                                CREATE(v.Character.Head, true)
-                            end
+                        if _G.FREE_FOR_ALL == false and v.TeamColor ~= PLAYER.TeamColor then
+                            CREATE(v.Character.Head)
+                        elseif _G.FREE_FOR_ALL == true then
+                            CREATE(v.Character.Head)
                         end
                     end
                 end
             end
         end
-        wait(1)
     end)
 end
 
-MOUSE.Button2Down:connect(function()
-    ENABLED = true
-end)
+-- Use UserInputService for better key and mouse input handling
+local UserInputService = game:GetService("UserInputService")
 
-MOUSE.Button2Up:connect(function()
-    ENABLED = false
-end)
-
-MOUSE.KeyDown:connect(function(KEY)
-    KEY = KEY:lower():byte()
-    if KEY == _G.ESP_BIND then
-        if ESP_ENABLED == false then
-            FIND()
-            ESP_ENABLED = true
-            print('ESP : ON')
-        elseif ESP_ENABLED == true then
-            wait()
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    
+    if input.UserInputType == Enum.UserInputType.MouseButton2 then
+        ENABLED = true
+    end
+    
+    if input.KeyCode == Enum.KeyCode[_G.ESP_BIND] then
+        if ESP_ENABLED then
             CLEAR()
             TRACK = false
             ESP_ENABLED = false
             print('ESP : OFF')
+        else
+            FIND()
+            ESP_ENABLED = true
+            print('ESP : ON')
         end
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton2 then
+        ENABLED = false
     end
 end)
 
 game:GetService('RunService').RenderStepped:connect(function()
     if ENABLED then
         local TARGET = GetNearestPlayerToMouse()
-        if (TARGET ~= false) then
-            local AIM = TARGET.Character:FindFirstChild("Head") -- Ensure only targeting Head
+        if TARGET then
+            local AIM = TARGET.Character:FindFirstChild(_G.AIM_AT)
             if AIM then
                 CC.CoordinateFrame = CFrame.new(CC.CoordinateFrame.p, AIM.CFrame.p)
             end
@@ -186,13 +167,12 @@ end)
 
 repeat
     wait()
-    if ESP_ENABLED == true then
+    if ESP_ENABLED then
         FIND()
     end
-until ESP_ENABLED == false
+until not ESP_ENABLED
 
 Notify({
-    -- ywxocustoms --
     UseYWXOcustoms = true, 
     Title = "KeyBinds :",
     TitleTextSize = 15,
@@ -202,5 +182,5 @@ Notify({
     ImageID = "100512298770323",
     AutoImageScale = true,
     ImagePos = "right",
-    ContainerPosition =  UDim2.new(0, 20, 0.5, -20);
+    ContainerPosition = UDim2.new(0, 20, 0.5, -20);
 })
