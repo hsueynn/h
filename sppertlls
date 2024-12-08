@@ -493,3 +493,22 @@ tool.Activated:Connect(function()
 end)
 
 tool.Parent = game.Players.LocalPlayer.Backpack
+--Run
+mouse = game.Players.LocalPlayer:GetMouse()
+tool = Instance.new("Tool")
+tool.RequiresHandle = false
+tool.Name = "Run"
+tool.Activated:connect(function()
+game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 26
+end)
+tool.Parent = game.Players.LocalPlayer.Backpack
+
+--Walk
+mouse = game.Players.LocalPlayer:GetMouse()
+tool = Instance.new("Tool")
+tool.RequiresHandle = false
+tool.Name = "Walk"
+tool.Activated:connect(function()
+game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+end)
+tool.Parent = game.Players.LocalPlayer.Backpack
