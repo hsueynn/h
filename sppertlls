@@ -413,7 +413,7 @@ end
 mouse = game.Players.LocalPlayer:GetMouse()
 tool = Instance.new("Tool")
 tool.RequiresHandle = false
-tool.Name = "Spectra Vision (Equip to See All)"
+tool.Name = "X-Ray (Equip to See All)"
 
 local uis = game:GetService("UserInputService")
 local xrayOn = false
